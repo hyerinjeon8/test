@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>포켓몬도감만들기</title>
+    <title>포켓몬도감만들기</title> <!--웹페이지 타이틀-->
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -75,7 +75,7 @@
             // predict can take in an image, video or canvas html element
             var image = document.getElementById("my-image")
             const prediction = await model.predict(image, false);
-            if(prediction[0].probability > 0.7){
+            if(prediction[0].probability > 0.7) {
                 labelContainer.childNodes[0].innerHTML = "위 포켓몬은 피카츄이다."
                 labelContainer.childNodes[1].innerHTML = "피카츄는 포켓몬스터에 등장하는 가상의 생명체이다. 애니메이션과 비디오게임에서는 오오타니 이쿠에가 그 목소리를 맡고 있다. 귀여운 전기 포켓몬을 그려달라는 스기모리 켄의 주문을 받아 니시다 아쓰코가 디자인하였다. 포켓몬 애니메이션에서 주인공 지우의 첫 포켓몬이자 파트너이다."
             }
@@ -89,6 +89,7 @@
             }
             else{
                 labelContainer.childNodes[0].innerHTML = "모르는 포켓몬이다."
+                labelContainer.childNodes[1].innerHTML = " "
             }
 
             //for (let i = 0; i < maxPredictions; i++) {
