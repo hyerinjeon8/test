@@ -5,34 +5,42 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>포켓몬도감만들기</title> <!--웹페이지 타이틀-->
-    <link rel="stylesheet" href="style.css">
+    <title>쓰레기 분류</title>
 </head>
 
 <body>
-    <h1> 포켓몬도감만들기</h1>
-    <p>피카츄, 파이리, 꼬부기를 구별해서 이에 대한 설명을 보여주는 웹 앱</p>
-    <button type="button" onclick="init()">Start</button>
-    <button type="button" onclick="predict()">Predict</button>
+    <h1> 재활용 가능 여부</h1>
+    <p>유리병, 박스, 페트병, 신문, 고무장갑, 도자기그릇 등</p>
+    <p>재활용 가능 여부를 예측해서 알려주는 웹페이지입니다</p>
+    <p>-----------------------------------------------</p>
+    <p>(주의)</p>
+    <p>100% 정확한 결과는 아닙니다</p>
+    <p>모르는 사물(물건)이 있을 수도 있습니다</p>
+    <p>-----------------------------------------------</p>
+
+    <button type="button" onclick="init()">시작하기</button>
+    <button type="button" onclick="predict()">결과확인</button>
+
     <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
     <div class="file-upload">
-        <button class="file-upload-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">Add
-            Image</button>
+        <button class="file-upload-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">사진
+            추가</button>
 
         <div class="image-upload-wrap">
             <input class="file-upload-input" type='file' onchange="readURL(this);" accept="image/*" />
             <div class="drag-text">
-                <h3>Drag and drop a file or select add Image</h3>
+                <h3>재활용 가능 여부를 알고 싶은 사물(물건)의 사진을 추가해주세요</h3>
             </div>
         </div>
         <div class="file-upload-content">
             <img class="file-upload-image" id="my-image" src="#" alt="your image" />
             <div class="image-title-wrap">
-                <button type="button" onclick="removeUpload()" class="remove-image">Remove <span
-                        class="image-title">Uploaded Image</span></button>
+                <button type="button" onclick="removeUpload()" class="remove-image">이미지 삭제 <span class="image-title">이미지
+                        업로드</span></button>
             </div>
         </div>
     </div>
+
     <div id="webcam-container"></div>
     <div id="label-container"></div>
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
@@ -42,7 +50,7 @@
         // https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
 
         // the link to your model provided by Teachable Machine export panel
-        const URL = "https://teachablemachine.withgoogle.com/models/tW5OLquHF/";
+        const URL = "https://teachablemachine.withgoogle.com/models/kvind1acN/";
 
         let model, webcam, labelContainer, maxPredictions;
 
@@ -58,46 +66,40 @@
             model = await tmImage.load(modelURL, metadataURL);
             maxPredictions = model.getTotalClasses();
 
-
-
-
             // append elements to the DOM
+            document.getElementById("webcam-container").appendChild(webcam.canvas);
             labelContainer = document.getElementById("label-container");
             for (let i = 0; i < maxPredictions; i++) { // and class labels
                 labelContainer.appendChild(document.createElement("div"));
             }
-        }
 
+            // run the webcam image through the image model
+            async function predict() {
+                // predict can take in an image, video or canvas html element
+                var image = document.getElementById("my-image")
+                const prediction = await model.predict(image, false);
 
+                if (prediction[0].probability > 0.7) {
+                    labelContainer.childNodes[0].innerHTML = "재활용이 가능한 사물(물건)인 것 같습니다."
+                    labelContainer.childNodes[1].innerHTML = ""
+                }
+                else if (prediction[1].probability > 0.7) {
+                    labelContainer.childNodes[0].innerHTML = "재활용할 수 없는 사물(물건)인 것 같습니다."
+                    labelContainer.childNodes[1].innerHTML = ""
+                }
+                else {
+                    labelContainer.childNodes[0].innerHTML = "모르겠습니다."
+                    labelContainer.childNodes[1].innerHTML = "다시 시도해도 안되면 다른 사진으로 바꿔주세요."
+                }
 
-        // run the webcam image through the image model
-        async function predict() {
-            // predict can take in an image, video or canvas html element
-            var image = document.getElementById("my-image")
-            const prediction = await model.predict(image, false);
-            if(prediction[0].probability > 0.7) {
-                labelContainer.childNodes[0].innerHTML = "위 포켓몬은 피카츄이다."
-                labelContainer.childNodes[1].innerHTML = "피카츄는 포켓몬스터에 등장하는 가상의 생명체이다. 애니메이션과 비디오게임에서는 오오타니 이쿠에가 그 목소리를 맡고 있다. 귀여운 전기 포켓몬을 그려달라는 스기모리 켄의 주문을 받아 니시다 아쓰코가 디자인하였다. 포켓몬 애니메이션에서 주인공 지우의 첫 포켓몬이자 파트너이다."
-            }
-            else if(prediction[1].probability > 0.7){
-                labelContainer.childNodes[0].innerHTML = "위 포켓몬은 파이리이다."
-                labelContainer.childNodes[1].innerHTML = "파이리는 포켓몬스터 시리즈에 등장하는 가공의 캐릭터이다. 한국명인 '파이리'는 영어로 불을 뜻하는 'Fire'와 꼬리의 합성어이다."
-            }
-            else if(prediction[1].probability > 0.7){
-                labelContainer.childNodes[0].innerHTML = "위 포켓몬은 꼬부기이다."
-                labelContainer.childNodes[1].innerHTML = "꼬부기는 포켓몬스터 시리즈에 등장하는 가공의 캐릭터이다. 분류는 꼬마거북 포켓몬이다."
-            }
-            else{
-                labelContainer.childNodes[0].innerHTML = "모르는 포켓몬이다."
-                labelContainer.childNodes[1].innerHTML = " "
-            }
-
-            //for (let i = 0; i < maxPredictions; i++) {
+                //for (let i = 0; i < maxPredictions; i++) {
                 //const classPrediction =
-                    //prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+                //prediction[i].className + ": " + prediction[i].probability.toFixed(2);
                 //labelContainer.childNodes[i].innerHTML = classPrediction;
-            //}
+                //}
+            }
         }
+
     </script>
     <script>function readURL(input) {
             if (input.files && input.files[0]) {
@@ -132,6 +134,8 @@
             $('.image-upload-wrap').removeClass('image-dropping');
         });
     </script>
+
+
 </body>
 
 </html>
